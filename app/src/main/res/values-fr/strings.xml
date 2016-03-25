@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_all">Tous les Flux</string>
+    <string name="refresh">Recharger</string>
+    <string name="no_connection">Pas de connexion internet</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="action_rss">Les Flux</string>
+    <string name="action_refresh">Recharger</string>
+    <string name="action_about">A propos</string>
+    <string name="about">afdgfbhdbfhjfhjfhfhgfghueghueghueghuegh</string>
+</resources>
