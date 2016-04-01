@@ -1,5 +1,7 @@
 package com.bitoaster.rssreader.app;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +29,7 @@ public class ItemsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         listView = (ListView) inflater.inflate(R.layout.fragment_items, container, false);
         adapter = new ItemAdapter(getContext(), new ArrayList<Item>());
         listView.setAdapter(adapter);
@@ -34,7 +37,9 @@ public class ItemsFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                Uri uri = Uri.parse(((Item)parent.getItemAtPosition(position)).getLink());
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
             }
         });
 

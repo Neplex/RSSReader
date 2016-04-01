@@ -17,10 +17,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -58,7 +58,19 @@ public class NavigationDrawerFragment extends Fragment {
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
 
-    public NavigationDrawerFragment() {
+    private SimpleAdapter adapter;
+
+    public NavigationDrawerFragment() {}
+
+    public void addAll(List<Channel> channels) {
+        adapter.clear();
+        List<Object> objects = new ArrayList<>();
+        objects.add(getString(R.string.title_all));
+        for (Channel c: channels)
+            if (c.getActive())
+                objects.add(c);
+        adapter.addAll(objects);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -97,13 +109,9 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_all),
-                }));
+
+        adapter = new SimpleAdapter(getContext(), new ArrayList<>());
+        mDrawerListView.setAdapter(adapter);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }

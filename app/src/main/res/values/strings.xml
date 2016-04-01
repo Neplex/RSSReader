@@ -22,4 +22,9 @@
         aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     </string>
+    <string name="addChannel">Add</string>
+    <string name="dialog_link">Channel link</string>
+    <string name="dialog_accept">Accept</string>
+    <string name="dialog_deny">Cancel</string>
+    <string name="invalidlink">Invalid link</string>
 </resources>

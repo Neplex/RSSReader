@@ -15,9 +15,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by ofroger on 23/03/16.
- */
 public class ParserXML extends AsyncTask<String, Void, Channel> {
     @Override
     protected Channel doInBackground(String... params) {

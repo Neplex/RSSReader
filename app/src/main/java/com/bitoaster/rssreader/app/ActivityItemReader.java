@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,19 +21,29 @@ public class ActivityItemReader extends ActionBarActivity implements NavigationD
     private ItemsFragment itemsFragment;
     private CharSequence title;
 
+    private List<Channel> channels;
+    private final static int nb_elem = 50;
+    private DBInteraction db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_reader);
 
         title = getTitle();
+        db = new DBInteraction(ActivityItemReader.this);
+        channels = db.getChannels();
+
+
+        refresh();
 
         // Set up the items
         itemsFragment = (ItemsFragment) getSupportFragmentManager().findFragmentById(R.id.items_fragment);
-        itemsFragment.addAll(refresh());
+        itemsFragment.addAll(db.allItems(nb_elem));
 
         // Set up the drawer.
         navigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        navigationDrawerFragment.addAll(channels);
         navigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
@@ -42,10 +51,12 @@ public class ActivityItemReader extends ActionBarActivity implements NavigationD
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        switch (position) {
-            case 0:
-                title = getString(R.string.app_name);
-                break;
+        if (position == 0) {
+            if (this.db != null)
+            itemsFragment.addAll(db.allItems(nb_elem));
+        } else {
+            Channel c = channels.get(position-1);
+            itemsFragment.addAll(c.getItems());
         }
     }
 
@@ -79,7 +90,9 @@ public class ActivityItemReader extends ActionBarActivity implements NavigationD
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                itemsFragment.addAll(refresh());
+                refresh();
+                itemsFragment.addAll(db.allItems(nb_elem));
+                navigationDrawerFragment.addAll(channels);
                 break;
             case R.id.action_rss:
                 startActivity(new Intent(this, ActivityChannel.class));
@@ -96,32 +109,20 @@ public class ActivityItemReader extends ActionBarActivity implements NavigationD
         return true;
     }
 
-    public List<Item> refresh() {
+    public void refresh() {
         Toast.makeText(this, getString(R.string.refresh), Toast.LENGTH_LONG).show();
-        DBInteraction db = new DBInteraction(getApplicationContext());
-        db.open();
         if (!(isOnline())) {
             Toast.makeText(getApplicationContext(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
         } else {
-            db.delete();
-            db.create();
-            try {
-                Channel c = new ParserXML().execute("http://www.lemonde.fr/jeux-video/rss_full.xml").get();
-                Channel c2 = new ParserXML().execute("http://www.lequipe.fr/rss/actu_rss_Tennis.xml").get();
-                Channel c3 = new ParserXML().execute("http://www.japscan.com/rss/").get();
-                db.insertFlux(c);
-                db.insertFlux(c2);
-                db.insertFlux(c3);
-            } catch (Exception e) {
-                e.printStackTrace();
+            db.clear();
+            for (Channel c: db.getChannels()) {
+                try {
+                    db.putChannel(new ParserXML().execute(c.getLink()).get());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
-        List<Item> items = new ArrayList<>();
-        for (Channel chan : db.getChannels()) {
-            for (Item i : chan.getItems()) {
-                items.add(i);
-            }
-        }
-        return items;
+        channels = db.getChannels();
     }
 }
